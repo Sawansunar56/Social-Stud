@@ -1,9 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/constants/colors.dart';
+import 'package:social_media/resources/auth_methods.dart';
 import 'package:social_media/utils/text_input.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final VoidCallback showRegisterPage;
+  const LoginScreen({super.key, required this.showRegisterPage});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -18,6 +21,22 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
     _emailController.dispose();
     _passController.dispose();
+  }
+
+  Future<void> login() async {
+    try {
+      AuthMethods().signInWithEmailAndPassword(
+          email: _emailController.text, password: _passController.text);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Invalid email or password.'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -72,24 +91,27 @@ class _LoginScreenState extends State<LoginScreen> {
                 flex: 1,
                 child: Container(),
               ),
-              Container(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: const Text(
-                    "Join Me",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                width: double.infinity,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: const ShapeDecoration(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(30),
+              GestureDetector(
+                onTap: login,
+                child: Container(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: const Text(
+                      "Join Me",
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
-                  color: shasPrimaryColor,
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: const ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(30),
+                      ),
+                    ),
+                    color: shasPrimaryColor,
+                  ),
                 ),
               ),
               Flexible(
@@ -103,12 +125,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: const Text("Don't have an account? "),
                     padding: const EdgeInsets.symmetric(vertical: 8),
                   ),
-                  Container(
-                    child: const Text(
-                      "Sign Up",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                  GestureDetector(
+                    onTap: widget.showRegisterPage,
+                    child: Container(
+                      child: const Text(
+                        "Sign Up",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
                   )
                 ],
               )

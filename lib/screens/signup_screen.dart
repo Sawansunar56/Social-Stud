@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,7 +8,8 @@ import 'package:social_media/utils/text_input.dart';
 import 'package:social_media/utils/utils.dart';
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+  final VoidCallback showLoginPage;
+  SignUpScreen({super.key, required this.showLoginPage});
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -18,6 +20,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
+  final TextEditingController _confirmPassController = TextEditingController();
   Uint8List? _image;
 
   @override
@@ -35,6 +38,70 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() {
       _image = im;
     });
+  }
+
+  bool passwordConfirmed() {
+    if (_passController.text.trim() == _confirmPassController.text.trim()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<void> signup() async {
+    try {
+      if (passwordConfirmed()) {
+        AuthMethods().signUpUser(
+          email: _emailController.text,
+          password: _passController.text,
+          username: _usernameController.text,
+          bio: _bioController.text,
+        );
+        // final UserCredential currentUser =
+        //     await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        //   email: emailController.text.trim(),
+        //   password: passwordController.text.trim(),
+        // );
+        // After successful sign up
+        // Navigator.pushReplacementNamed(context, '/create_profile');
+        // addUserDetails(
+        //   fullnameController.text.trim(),
+        //   phNumberController.text.trim(),
+        //   passwordController.text.trim(),
+        //   emailController.text.trim(),
+        //   currentUser.user!.uid,
+        // );
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: Text('  Password Not Matched'),
+            );
+          },
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: Text('Password is Week, Choose Stronger one'),
+            );
+          },
+        );
+      } else if (e.code == 'email-already-in-use') {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                content: Text(
+                    'Oops ! Account for this email already exits, please LOGIN instead'),
+              );
+            });
+      }
+    }
   }
 
   @override
@@ -130,11 +197,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 InkWell(
                   onTap: () async {
                     String res = await AuthMethods().signUpUser(
-                        email: _emailController.text,
-                        password: _passController.text,
-                        username: _usernameController.text,
-                        bio: _bioController.text,
-                        file: _image!);
+                      email: _emailController.text,
+                      password: _passController.text,
+                      username: _usernameController.text,
+                      bio: _bioController.text,
+                    );
                     print(res);
                   },
                   child: Container(
@@ -169,12 +236,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       child: const Text("I have an Account. "),
                       padding: const EdgeInsets.symmetric(vertical: 8),
                     ),
-                    Container(
-                      child: const Text(
-                        "Log In",
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                    GestureDetector(
+                      onTap: widget.showLoginPage,
+                      child: Container(
+                        child: const Text(
+                          "Log In",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 8),
                     )
                   ],
                 )
