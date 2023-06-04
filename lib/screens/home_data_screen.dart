@@ -13,7 +13,7 @@ class HomeDataScreen extends StatelessWidget {
   }
 
   Stream<QuerySnapshot> getUserStream() {
-    return FirebaseFirestore.instance.collection('Users').snapshots();
+    return FirebaseFirestore.instance.collection('users').snapshots();
   }
 
   @override

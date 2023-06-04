@@ -1,7 +1,6 @@
 import "package:curved_navigation_bar/curved_navigation_bar.dart";
 import "package:flutter/material.dart";
 import "package:social_media/constants/colors.dart";
-import "package:social_media/resources/auth_methods.dart";
 import "package:social_media/screens/chat_list_screen.dart";
 import "package:social_media/screens/home_data_screen.dart";
 import "package:social_media/screens/post_creation_screen.dart";
@@ -60,9 +59,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(onPressed: () {
-        AuthMethods().signOut();
-      }),
     );
   }
 }
