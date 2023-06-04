@@ -37,6 +37,7 @@ class AuthMethods {
 
         _firestore.collection('Users').doc(cred.user!.uid).set({
           'username': username,
+          'powername': username,
           'uid': cred.user!.uid,
           'email': email,
           'password': password,

@@ -56,6 +56,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           password: _passController.text,
           username: _usernameController.text,
           bio: _bioController.text,
+          // image: _image,
         );
         // final UserCredential currentUser =
         //     await FirebaseAuth.instance.createUserWithEmailAndPassword(

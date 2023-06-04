@@ -1,11 +1,18 @@
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/constants/colors.dart';
 import 'package:social_media/utils/post_view.dart';
 
 class HomeDataScreen extends StatelessWidget {
   const HomeDataScreen({super.key});
+
+  Stream<QuerySnapshot> getDataStream() {
+    final String userId = FirebaseAuth.instance.currentUser!.uid.toString();
+    return FirebaseFirestore.instance.collection('posts').snapshots();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +26,11 @@ class HomeDataScreen extends StatelessWidget {
               children: [
                 Text(
                   "Explore",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 )
               ],
             ),
+            SizedBox(height: 10),
             SizedBox(
               height: 90,
               child: ListView(
@@ -49,10 +57,36 @@ class HomeDataScreen extends StatelessWidget {
             Expanded(
                 child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: ListView(
-                children: [
-                  PostView(),
-                ],
+              child: StreamBuilder(
+                stream: getDataStream(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text('Something went wrong'),
+                    );
+                  }
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  final posts = snapshot.data!.docs;
+
+                  return ListView.builder(
+                    itemCount: posts.length,
+                    itemBuilder: (context, index) {
+                      final post = posts[index].data() as Map<String, dynamic>;
+                      final postId = posts[index].reference.id;
+                      return PostView(
+                        post: post,
+                        postId: postId,
+                      );
+                    },
+                  );
+                },
               ),
             ))
           ],

@@ -2,8 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/constants/colors.dart';
 import 'package:social_media/resources/auth_manager.dart';
-import 'package:social_media/screens/profile_screen.dart';
-import 'package:social_media/screens/signup_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

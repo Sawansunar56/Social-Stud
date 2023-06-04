@@ -18,12 +18,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int selectedItemIndex = 0;
 
-  static const List<Widget> _pages = <Widget>[
-    HomeDataScreen(),
-    ChatListScreen(),
+  static final List<Widget> _pages = <Widget>[
+    const HomeDataScreen(),
+    const ChatListScreen(),
     PostCreation(),
-    SearchScreen(),
-    ProfileScreen(),
+    const SearchScreen(),
+    const ProfileScreen(),
   ];
   @override
   Widget build(BuildContext context) {
@@ -60,9 +60,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      // floatingActionButton: FloatingActionButton(onPressed: () {
-      //   AuthMethods().signOut();
-      // }),
+      floatingActionButton: FloatingActionButton(onPressed: () {
+        AuthMethods().signOut();
+      }),
     );
   }
 }

@@ -14,85 +14,120 @@ class ProfileScreen extends StatelessWidget {
             child: Column(children: [
               Stack(children: [
                 Container(
-                  height: 100,
+                  height: 200,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.amber,
+                    color: Colors.white,
                     image: DecorationImage(
+                      fit: BoxFit.cover,
                       image: NetworkImage(
-                          'https://w0.peakpx.com/wallpaper/172/772/HD-wallpaper-polina-pretty-girl-model-blonde-beauty-russian.jpg'),
+                          'https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60'),
                     ),
                   ),
-                  child: Text("red"),
+                  child: Text(""),
                 ),
-                ClipRRect(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(50.0),
-                      topRight: Radius.circular(50.0)),
-                  child: Container(
-                    decoration: BoxDecoration(color: Colors.red),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 30.0, vertical: 20.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text("Follower"),
-                              Text("Following"),
-                            ],
-                          ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                "@relative",
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 20),
-                              Text(
-                                  "My Name is Shashanka Gogoi and I am the best in blender works"),
-                              const SizedBox(height: 20),
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black26,
-                                      blurRadius: 3.0,
-                                      spreadRadius: 2,
-                                    ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 150.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(50.0),
+                        topRight: Radius.circular(50.0)),
+                    child: Container(
+                      decoration: BoxDecoration(color: Colors.white),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30.0, vertical: 20.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Column(
+                                  children: [
+                                    Text("123"),
+                                    Text("Follower"),
                                   ],
                                 ),
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    minimumSize: Size(120, 45),
-                                    backgroundColor: Colors.amber[600],
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20.0)),
-                                  ),
-                                  onPressed: () {},
-                                  child: Text(
-                                    "Manage",
-                                    style: TextStyle(color: Colors.black),
-                                  ),
+                                SizedBox(
+                                  width: 100,
                                 ),
-                              )
-                            ],
-                          )
-                        ],
+                                Column(
+                                  children: [
+                                    Text("123"),
+                                    Text("Following"),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const SizedBox(height: 20),
+                                Text(
+                                  "@relative",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 20),
+                                Text(
+                                    textAlign: TextAlign.center,
+                                    "My Name is Shashanka Gogoi and I am the best in blender works"),
+                                const SizedBox(height: 20),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black26,
+                                        blurRadius: 3.0,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
+                                  ),
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      minimumSize: Size(120, 45),
+                                      backgroundColor: Colors.amber[600],
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30.0)),
+                                    ),
+                                    onPressed: () {},
+                                    child: Text(
+                                      "Manage",
+                                      style: TextStyle(color: Colors.black),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned.fill(
+                  top: 110,
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: CircleAvatar(
+                      radius: 40,
+                      backgroundColor: shasBackgroundColor,
+                      child: CircleAvatar(
+                        radius: 35,
+                        child: Text(""),
+                        backgroundImage: NetworkImage(
+                            "https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60"),
                       ),
                     ),
                   ),
                 ),
               ]),
-              Flexible(
-                flex: 1,
+              Expanded(
                 child: ClipRRect(
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(50.0),
@@ -112,53 +147,75 @@ class ProfileScreen extends StatelessWidget {
                           crossAxisCount: 2,
                           children: [
                             Container(
-                                child: Image.network(
-                                    "https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171__480.jpg")),
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                      'https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60'),
+                                ),
+                              ),
+                              child: Text(""),
+                            ),
                             Container(
-                                child: Image.network(
-                                    "https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171__480.jpg")),
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                      'https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60'),
+                                ),
+                              ),
+                              child: Text(""),
+                            ),
                             Container(
-                                child: Image.network(
-                                    "https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171__480.jpg")),
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                      'https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60'),
+                                ),
+                              ),
+                              child: Text(""),
+                            ),
                             Container(
-                                child: Image.network(
-                                    "https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171__480.jpg")),
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                      'https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60'),
+                                ),
+                              ),
+                              child: Text(""),
+                            ),
                             Container(
-                                child: Image.network(
-                                    "https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171__480.jpg")),
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                      'https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60'),
+                                ),
+                              ),
+                              child: Text(""),
+                            ),
                             Container(
-                                child: Image.network(
-                                    "https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171__480.jpg")),
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                      'https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60'),
+                                ),
+                              ),
+                              child: Text(""),
+                            ),
                             Container(
-                                child: Image.network(
-                                    "https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171__480.jpg")),
-                            Container(
-                                child: Image.network(
-                                    "https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171__480.jpg")),
-                            Container(
-                                child: Image.network(
-                                    "https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171__480.jpg")),
-                            Container(
-                                child: Image.network(
-                                    "https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171__480.jpg")),
-                            Container(
-                                child: Image.network(
-                                    "https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171__480.jpg")),
-                            Container(
-                                child: Image.network(
-                                    "https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171__480.jpg")),
-                            Container(
-                                child: Image.network(
-                                    "https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171__480.jpg")),
-                            Container(
-                                child: Image.network(
-                                    "https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171__480.jpg")),
-                            Container(
-                                child: Image.network(
-                                    "https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171__480.jpg")),
-                            Container(
-                                child: Image.network(
-                                    "https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171__480.jpg")),
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                      'https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60'),
+                                ),
+                              ),
+                              child: Text(""),
+                            ),
                           ],
                         ),
                       ),
