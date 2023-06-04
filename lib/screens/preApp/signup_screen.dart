@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -6,6 +9,7 @@ import 'package:social_media/constants/colors.dart';
 import 'package:social_media/resources/auth_methods.dart';
 import 'package:social_media/utils/text_input.dart';
 import 'package:social_media/utils/utils.dart';
+import 'package:uuid/uuid.dart';
 
 class SignUpScreen extends StatefulWidget {
   final VoidCallback showLoginPage;
@@ -21,6 +25,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
   final TextEditingController _confirmPassController = TextEditingController();
+  XFile? image;
   Uint8List? _image;
 
   @override
@@ -32,14 +37,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _bioController.dispose();
   }
 
-  void selectImage() async {
-    Uint8List im = await pickImage(ImageSource.gallery);
-
-    setState(() {
-      _image = im;
-    });
-  }
-
   bool passwordConfirmed() {
     if (_passController.text.trim() == _confirmPassController.text.trim()) {
       return true;
@@ -48,15 +45,47 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+  void selectImage() async {
+    var im = await pickImage(ImageSource.gallery);
+
+    print(im);
+    setState(() {
+      image = im[0];
+      _image = im[1];
+    });
+  }
+
+  uploadImage() async {
+    String image_url = "";
+    if (image != null) {
+      String uniqueId = Uuid().v4();
+      var imageFile = File(image!.path);
+
+      FirebaseStorage storage = FirebaseStorage.instance;
+      Reference ref = storage.ref().child("Image-" + uniqueId);
+
+      UploadTask uploadTask = ref.putFile(imageFile);
+      await uploadTask.whenComplete(() async {
+        var url = await ref.getDownloadURL();
+        image_url = url.toString();
+      }).catchError((onError) {
+        print(onError);
+      });
+    }
+    return image_url;
+  }
+
   Future<void> signup() async {
     try {
       if (passwordConfirmed()) {
+        String image_url = await uploadImage();
+        print(image_url);
         AuthMethods().signUpUser(
           email: _emailController.text,
           password: _passController.text,
           username: _usernameController.text,
           bio: _bioController.text,
-          // image: _image,
+          image: image_url,
         );
         // final UserCredential currentUser =
         //     await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -117,7 +146,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
-                  height: 60,
+                  height: 30,
                 ),
                 Align(
                   alignment: Alignment.centerLeft,
@@ -135,7 +164,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 const SizedBox(
-                  height: 40,
+                  height: 30,
                 ),
                 Stack(
                   children: [
@@ -194,16 +223,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   isPass: true,
                   labelText: "Password: ",
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(
+                  height: 24,
+                ),
+                TextInput(
+                  textEditingController: _confirmPassController,
+                  hintText: "Confirm Password",
+                  textInputType: TextInputType.text,
+                  isPass: true,
+                  labelText: "Confirm Password: ",
+                ),
+                const SizedBox(height: 40),
                 InkWell(
-                  onTap: () async {
-                    String res = await AuthMethods().signUpUser(
-                      email: _emailController.text,
-                      password: _passController.text,
-                      username: _usernameController.text,
-                      bio: _bioController.text,
-                    );
-                    print(res);
+                  onTap: () {
+                    signup();
                   },
                   child: Container(
                     child: Padding(

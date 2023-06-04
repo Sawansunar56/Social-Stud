@@ -24,18 +24,20 @@ class AuthMethods {
     required String password,
     required String username,
     required String bio,
-    // required Uint8List file,
+    required String image,
   }) async {
     String res = "Some Fault has Occured";
     try {
       if (email.isNotEmpty ||
           password.isNotEmpty ||
           username.isNotEmpty ||
-          bio.isNotEmpty) {
+          bio.isNotEmpty ||
+          image.isNotEmpty) {
         UserCredential cred = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
 
         _firestore.collection('Users').doc(cred.user!.uid).set({
+          'profileImage': image,
           'username': username,
           'powername': username,
           'uid': cred.user!.uid,

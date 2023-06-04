@@ -83,7 +83,7 @@ class PostView extends StatelessWidget {
                                 SizedBox(
                                   width: 5,
                                 ),
-                                Text("1"),
+                                Text("${post['likes']}"),
                               ],
                             ),
                             SizedBox(
@@ -96,7 +96,7 @@ class PostView extends StatelessWidget {
                                 SizedBox(
                                   width: 5,
                                 ),
-                                Text("5")
+                                Text("${post['comments'].length}")
                               ],
                             )
                           ],
