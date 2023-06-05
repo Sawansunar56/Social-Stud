@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:social_media/screens/post_page.dart';
 
 class PostView extends StatefulWidget {
   final Map<String, dynamic> post;
@@ -14,10 +15,24 @@ class PostView extends StatefulWidget {
 
 class _PostViewState extends State<PostView> {
   Map<String, dynamic>? userData;
+  int commentNumber = 0;
   @override
   void initState() {
     super.initState();
     getUserData();
+    getCommentCount(widget.postId);
+  }
+
+  Future<void> getCommentCount(String postId) async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .collection('comments')
+        .get();
+
+    setState(() {
+      commentNumber = snapshot.size;
+    });
   }
 
   getUserData() async {
@@ -88,77 +103,88 @@ class _PostViewState extends State<PostView> {
                 ),
               ),
             ),
-            Card(
-              clipBehavior: Clip.hardEdge,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Column(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(30.0),
-                        child: Container(
-                            child: Image.network(
-                                "https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60")),
-                      ),
-                    ],
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    child: Container(
-                      height: 80,
-                      width: 390,
-                      clipBehavior: Clip.hardEdge,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20.0),
-                          bottomRight: Radius.circular(20.0),
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => PostPage(
+                        post: widget.post,
+                        postId: widget.postId,
+                        userData: userData!)));
+              },
+              child: Card(
+                clipBehavior: Clip.hardEdge,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Column(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(30.0),
+                          child: Container(
+                              child: Image.network(
+                                  "https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60")),
                         ),
-                      ),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                          child: Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  increaseLike(widget.postId);
-                                  print("LIke");
-                                },
-                                child: Row(
+                      ],
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      child: Container(
+                        height: 80,
+                        width: 390,
+                        clipBehavior: Clip.hardEdge,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(20.0),
+                            bottomRight: Radius.circular(20.0),
+                          ),
+                        ),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 30.0),
+                            child: Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    increaseLike(widget.postId);
+                                    print("LIke");
+                                  },
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.thumb_up),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text("${widget.post['likes']}"),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 50,
+                                ),
+                                Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Icon(Icons.thumb_up),
+                                    Icon(Icons.comment),
                                     SizedBox(
                                       width: 5,
                                     ),
-                                    Text("${widget.post['likes']}"),
+                                    Text("${commentNumber}")
                                   ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: 50,
-                              ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.comment),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text("${widget.post['comments'].length}")
-                                ],
-                              )
-                            ],
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             )
           ],
