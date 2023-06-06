@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/constants/colors.dart';
+import 'package:social_media/screens/view_profile_screen.dart';
 import 'package:social_media/utils/post_view.dart';
 
 class HomeDataScreen extends StatelessWidget {
@@ -58,22 +59,30 @@ class HomeDataScreen extends StatelessWidget {
                     itemCount: users.length,
                     itemBuilder: (context, index) {
                       final user = users[index].data() as Map<String, dynamic>;
+                      final userId = users[index].reference.id;
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Column(
-                          children: [
-                            CircleAvatar(
-                              radius: 25,
-                              backgroundColor: shasPrimaryColor,
-                              child: CircleAvatar(
-                                radius: 22,
-                                backgroundImage: NetworkImage(
-                                  user['profileImage'],
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    ViewProfile(userId: userId)));
+                          },
+                          child: Column(
+                            children: [
+                              CircleAvatar(
+                                radius: 25,
+                                backgroundColor: shasPrimaryColor,
+                                child: CircleAvatar(
+                                  radius: 22,
+                                  backgroundImage: NetworkImage(
+                                    user['profileImage'],
+                                  ),
                                 ),
                               ),
-                            ),
-                            Text(user["username"]),
-                          ],
+                              Text(user["username"]),
+                            ],
+                          ),
                         ),
                       );
                     },

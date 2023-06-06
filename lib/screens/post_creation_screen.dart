@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 
 class PostCreation extends StatelessWidget {
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -26,9 +27,10 @@ class PostCreation extends StatelessWidget {
     String image_url = "";
     if (image != null) {
       var imageFile = File(image!.path);
+      String uniqueId = Uuid().v4();
 
       FirebaseStorage storage = FirebaseStorage.instance;
-      Reference ref = storage.ref().child("Image-");
+      Reference ref = storage.ref().child("Image-" + uniqueId);
 
       UploadTask uploadTask = ref.putFile(imageFile);
       await uploadTask.whenComplete(() async {

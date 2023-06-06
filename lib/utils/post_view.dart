@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/screens/post_page.dart';
+import 'package:social_media/screens/view_profile_screen.dart';
 
 class PostView extends StatefulWidget {
   final Map<String, dynamic> post;
@@ -36,7 +37,6 @@ class _PostViewState extends State<PostView> {
   }
 
   getUserData() async {
-    print(widget.post["userId"]);
     final userSnapshot = await FirebaseFirestore.instance
         .collection('users')
         .doc(widget.post["userId"])
@@ -74,7 +74,10 @@ class _PostViewState extends State<PostView> {
               padding: const EdgeInsets.all(8.0),
               child: GestureDetector(
                 onTap: () {
-                  print("profile");
+                  print(widget.post["userId"]);
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          ViewProfile(userId: widget.post["userId"])));
                 },
                 child: Row(
                   children: [
@@ -123,8 +126,7 @@ class _PostViewState extends State<PostView> {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(30.0),
                           child: Container(
-                              child: Image.network(
-                                  "https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60")),
+                              child: Image.network(widget.post["postImage"])),
                         ),
                       ],
                     ),

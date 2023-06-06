@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/constants/colors.dart';
 import 'package:social_media/utils/comment_view.dart';
@@ -9,23 +10,45 @@ class PostPage extends StatelessWidget {
   Map<String, dynamic> userData;
   TextEditingController _commentController = TextEditingController();
 
+  @override
+  void dispose() {
+    _commentController.dispose();
+  }
+
   PostPage(
       {super.key,
       required this.post,
       required this.postId,
       required this.userData});
 
-  addComment() async {
-    await FirebaseFirestore.instance
-        .collection('posts')
-        .doc(postId)
-        .collection("comments")
-        .add({
-      "postId": postId,
-      "userId": userData["uid"],
-      "username": userData["username"],
-      "content": _commentController.text.trimRight(),
-    });
+  addComment(String comment) async {
+    String curUserId = await FirebaseAuth.instance.currentUser!.uid;
+    try {
+      final userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(curUserId)
+          .get();
+
+      if (userSnapshot.exists) {
+        final curUser = userSnapshot.data() as Map<String, dynamic>;
+        await FirebaseFirestore.instance
+            .collection('posts')
+            .doc(postId)
+            .collection("comments")
+            .add({
+          "postId": postId,
+          "userId": curUserId,
+          "username": curUser["username"],
+          "content": comment,
+        });
+      } else {
+        print("user document does not exist");
+      }
+    } catch (e) {
+      print("Error has occured: $e");
+    }
+
+    _commentController.clear();
   }
 
   Stream<QuerySnapshot> getCommentStream() {
@@ -131,8 +154,7 @@ class PostPage extends StatelessWidget {
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(30.0),
                                   child: Container(
-                                      child: Image.network(
-                                          "https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60")),
+                                      child: Image.network(post["postImage"])),
                                 ),
                               ],
                             ),
@@ -260,8 +282,11 @@ class PostPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30.0)),
                     child: IconButton(
                       onPressed: () {
-                        addComment();
-                        _commentController.clear();
+                        final message = _commentController.text.trimRight();
+                        if (message.isNotEmpty) {
+                          addComment(message);
+                        }
+                        // _commentController.clear();
                       },
                       icon: Icon(
                         Icons.send,
