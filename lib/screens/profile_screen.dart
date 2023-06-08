@@ -3,9 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/constants/colors.dart';
 import 'package:social_media/resources/auth_methods.dart';
+import 'package:social_media/screens/edit_profile.dart';
+import 'package:social_media/screens/foll_screen.dart';
+import 'package:social_media/screens/post_page.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  bool toggler;
+  ProfileScreen({super.key, required this.toggler});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -41,6 +45,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Stream<QuerySnapshot> getPostStream() {
+    return FirebaseFirestore.instance
+        .collection('posts')
+        .where("userId", isEqualTo: userData!["uid"])
+        .snapshots();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,6 +75,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         child: Text(""),
                       ),
+                      widget.toggler
+                          ? Positioned(
+                              top: 10,
+                              left: 10,
+                              child: Container(
+                                height: 45,
+                                width: 45,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: IconButton(
+                                  onPressed: () {
+                                    // AuthMethods().signOut();
+                                    Navigator.of(context).pop();
+                                  },
+                                  icon: Icon(
+                                    Icons.arrow_back_ios_new,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Text(""),
                       Positioned(
                         top: 10,
                         right: 10,
@@ -103,22 +138,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceEvenly,
                                     children: [
-                                      Column(
-                                        children: [
-                                          Text(
-                                              "${userData?['followers'].length}"),
-                                          Text("Follower"),
-                                        ],
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      FollScreen(
+                                                          toggler: false,
+                                                          userData:
+                                                              userData!)));
+                                        },
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                                "${userData?['followers'].length}"),
+                                            Text("followers"),
+                                          ],
+                                        ),
                                       ),
                                       SizedBox(
                                         width: 100,
                                       ),
-                                      Column(
-                                        children: [
-                                          Text(
-                                              "${userData?['following'].length}"),
-                                          Text("Following"),
-                                        ],
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      FollScreen(
+                                                          toggler: true,
+                                                          userData:
+                                                              userData!)));
+                                        },
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                                "${userData?['following'].length}"),
+                                            Text("Following"),
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -161,7 +218,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                     BorderRadius.circular(
                                                         30.0)),
                                           ),
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        EditProfile()));
+                                          },
                                           child: Text(
                                             "Manage",
                                             style:
@@ -208,82 +270,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(40.0),
                                   topRight: Radius.circular(40.0)),
-                              child: GridView.count(
-                                mainAxisSpacing: 10,
-                                crossAxisSpacing: 10,
-                                crossAxisCount: 2,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        fit: BoxFit.cover,
-                                        image: NetworkImage(
-                                            'https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60'),
-                                      ),
+                              child: StreamBuilder(
+                                stream: getPostStream(),
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Center(
+                                      child: Text('Something went wrong'),
+                                    );
+                                  }
+
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+
+                                  final posts = snapshot.data!.docs;
+
+                                  return SizedBox(
+                                    height: 400,
+                                    child: GridView.builder(
+                                      gridDelegate:
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 2,
+                                              mainAxisExtent: 260,
+                                              mainAxisSpacing: 20,
+                                              crossAxisSpacing: 20),
+                                      itemCount: posts.length,
+                                      itemBuilder: (context, index) {
+                                        final post = posts[index].data()
+                                            as Map<String, dynamic>;
+                                        final postId =
+                                            posts[index].reference.id;
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                            image: DecorationImage(
+                                              fit: BoxFit.cover,
+                                              image: NetworkImage(
+                                                  post['postImage']),
+                                            ),
+                                          ),
+                                          child: GestureDetector(
+                                              onTap: () {
+                                                Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            PostPage(
+                                                              post: post,
+                                                              postId: postId,
+                                                              userData:
+                                                                  userData!,
+                                                            )));
+                                              },
+                                              child: Text("")),
+                                        );
+                                      },
                                     ),
-                                    child: Text(""),
-                                  ),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        fit: BoxFit.cover,
-                                        image: NetworkImage(
-                                            'https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60'),
-                                      ),
-                                    ),
-                                    child: Text(""),
-                                  ),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        fit: BoxFit.cover,
-                                        image: NetworkImage(
-                                            'https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60'),
-                                      ),
-                                    ),
-                                    child: Text(""),
-                                  ),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        fit: BoxFit.cover,
-                                        image: NetworkImage(
-                                            'https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60'),
-                                      ),
-                                    ),
-                                    child: Text(""),
-                                  ),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        fit: BoxFit.cover,
-                                        image: NetworkImage(
-                                            'https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60'),
-                                      ),
-                                    ),
-                                    child: Text(""),
-                                  ),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        fit: BoxFit.cover,
-                                        image: NetworkImage(
-                                            'https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60'),
-                                      ),
-                                    ),
-                                    child: Text(""),
-                                  ),
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        fit: BoxFit.cover,
-                                        image: NetworkImage(
-                                            'https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60'),
-                                      ),
-                                    ),
-                                    child: Text(""),
-                                  ),
-                                ],
+                                  );
+                                },
                               ),
                             ),
                           ),

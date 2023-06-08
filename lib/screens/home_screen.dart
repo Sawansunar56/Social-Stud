@@ -22,7 +22,9 @@ class _HomeScreenState extends State<HomeScreen> {
     ChatListScreen(),
     PostCreation(),
     const SearchScreen(),
-    const ProfileScreen(),
+    ProfileScreen(
+      toggler: false,
+    ),
   ];
   @override
   Widget build(BuildContext context) {

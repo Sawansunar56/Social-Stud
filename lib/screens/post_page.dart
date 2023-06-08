@@ -10,11 +10,6 @@ class PostPage extends StatelessWidget {
   Map<String, dynamic> userData;
   TextEditingController _commentController = TextEditingController();
 
-  @override
-  void dispose() {
-    _commentController.dispose();
-  }
-
   PostPage(
       {super.key,
       required this.post,
@@ -165,7 +160,7 @@ class PostPage extends StatelessWidget {
                         height: 20,
                       ),
                       Text(
-                        "This is how my life is currently going on, and I think that everything would be better or worse in the end",
+                        post["caption"],
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600),
                         textAlign: TextAlign.center,

@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/screens/post_page.dart';
 
 import '../constants/colors.dart';
-import '../resources/auth_methods.dart';
 
 class ViewProfile extends StatefulWidget {
   String userId;
@@ -15,11 +15,42 @@ class ViewProfile extends StatefulWidget {
 
 class _ViewProfileState extends State<ViewProfile> {
   Map<String, dynamic>? userData;
+  String curUserId = FirebaseAuth.instance.currentUser!.uid;
+  bool isFollowing = false;
+  int followers = 0;
+  int following = 0;
 
   @override
   void initState() {
     super.initState();
     fetchUserData();
+    isFollowingChecker();
+  }
+
+  isFollowingChecker() async {
+    bool data = await checkFollowingExists();
+    setState(() {
+      isFollowing = data;
+    });
+  }
+
+  checkFollowingExists() async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(curUserId)
+          .get();
+
+      if (snapshot.exists) {
+        List<dynamic> following = snapshot.get('following') ?? [];
+        return following.contains(widget.userId);
+      }
+
+      return false;
+    } catch (e) {
+      print('Error checking message existence: $e');
+      return false;
+    }
   }
 
   Stream<QuerySnapshot> getPostStream() {
@@ -39,6 +70,8 @@ class _ViewProfileState extends State<ViewProfile> {
       if (userSnapshot.exists) {
         setState(() {
           userData = userSnapshot.data() as Map<String, dynamic>;
+          followers = userData?["followers"].length;
+          following = userData?["following"].length;
         });
       } else {
         print("user document does not exist");
@@ -46,6 +79,50 @@ class _ViewProfileState extends State<ViewProfile> {
     } catch (e) {
       print("Error has occured: $e");
     }
+  }
+
+  followFunction() async {
+    await FirebaseFirestore.instance.collection("users").doc(curUserId).update({
+      "following": FieldValue.arrayUnion([widget.userId])
+    });
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(widget.userId)
+        .update({
+      "followers": FieldValue.arrayUnion([curUserId])
+    });
+    setState(() {
+      isFollowing = true;
+      followers += 1;
+    });
+  }
+
+  unfollowFunction() async {
+    await FirebaseFirestore.instance.collection("users").doc(curUserId).update({
+      "following": FieldValue.arrayRemove([widget.userId])
+    });
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(widget.userId)
+        .update({
+      "followers": FieldValue.arrayRemove([curUserId])
+    });
+    setState(() {
+      isFollowing = false;
+      followers -= 1;
+    });
+  }
+
+  makeChatRoom() async {
+    await FirebaseFirestore.instance.collection("users").doc(curUserId).update({
+      "messengers": FieldValue.arrayUnion([widget.userId])
+    });
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(widget.userId)
+        .update({
+      "messengers": FieldValue.arrayUnion([curUserId])
+    });
   }
 
   @override
@@ -113,8 +190,7 @@ class _ViewProfileState extends State<ViewProfile> {
                                     children: [
                                       Column(
                                         children: [
-                                          Text(
-                                              "${userData?['followers'].length}"),
+                                          Text("${followers}"),
                                           Text("Follower"),
                                         ],
                                       ),
@@ -123,8 +199,7 @@ class _ViewProfileState extends State<ViewProfile> {
                                       ),
                                       Column(
                                         children: [
-                                          Text(
-                                              "${userData?['following'].length}"),
+                                          Text("${following}"),
                                           Text("Following"),
                                         ],
                                       ),
@@ -148,35 +223,85 @@ class _ViewProfileState extends State<ViewProfile> {
                                         textAlign: TextAlign.center,
                                       ),
                                       const SizedBox(height: 20),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(30.0),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black26,
-                                              blurRadius: 3.0,
-                                              spreadRadius: 2,
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(30.0),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey.shade400
+                                                      .withOpacity(0.5),
+                                                  blurRadius: 3.0,
+                                                  spreadRadius: 2,
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            minimumSize: Size(120, 45),
-                                            backgroundColor: Colors.amber[600],
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        30.0)),
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                minimumSize: Size(120, 45),
+                                                backgroundColor: !isFollowing
+                                                    ? Colors.amber[600]
+                                                    : shasPrimaryColor,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            30.0)),
+                                              ),
+                                              onPressed: () {
+                                                if (isFollowing) {
+                                                  unfollowFunction();
+                                                } else {
+                                                  followFunction();
+                                                }
+                                              },
+                                              child: Text(
+                                                !isFollowing
+                                                    ? "Follow"
+                                                    : "Followed",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                            ),
                                           ),
-                                          onPressed: () {},
-                                          child: Text(
-                                            "Manage",
-                                            style:
-                                                TextStyle(color: Colors.black),
-                                          ),
-                                        ),
-                                      )
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(30.0),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey.shade500
+                                                      .withOpacity(0.5),
+                                                  blurRadius: 3.0,
+                                                  spreadRadius: 2,
+                                                ),
+                                              ],
+                                            ),
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                minimumSize: Size(120, 45),
+                                                backgroundColor:
+                                                    shasPrimaryColor,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            30.0)),
+                                              ),
+                                              onPressed: () {
+                                                makeChatRoom();
+                                              },
+                                              child: Text(
+                                                "Message",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                     ],
                                   )
                                 ],

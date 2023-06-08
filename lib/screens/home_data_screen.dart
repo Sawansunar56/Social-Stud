@@ -1,8 +1,10 @@
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/constants/colors.dart';
+import 'package:social_media/screens/profile_screen.dart';
 import 'package:social_media/screens/view_profile_screen.dart';
 import 'package:social_media/utils/post_view.dart';
 
@@ -64,9 +66,17 @@ class HomeDataScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: GestureDetector(
                           onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    ViewProfile(userId: userId)));
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(builder: (context) {
+                              if (FirebaseAuth.instance.currentUser!.uid !=
+                                  userId) {
+                                return ViewProfile(userId: userId);
+                              } else {
+                                return ProfileScreen(
+                                  toggler: true,
+                                );
+                              }
+                            }));
                           },
                           child: Column(
                             children: [

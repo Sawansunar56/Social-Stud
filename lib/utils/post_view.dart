@@ -1,8 +1,10 @@
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media/screens/post_page.dart';
+import 'package:social_media/screens/profile_screen.dart';
 import 'package:social_media/screens/view_profile_screen.dart';
 
 class PostView extends StatefulWidget {
@@ -74,10 +76,17 @@ class _PostViewState extends State<PostView> {
               padding: const EdgeInsets.all(8.0),
               child: GestureDetector(
                 onTap: () {
-                  print(widget.post["userId"]);
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          ViewProfile(userId: widget.post["userId"])));
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) {
+                    if (FirebaseAuth.instance.currentUser!.uid !=
+                        widget.post["userId"]) {
+                      return ViewProfile(userId: widget.post["userId"]);
+                    } else {
+                      return ProfileScreen(
+                        toggler: true,
+                      );
+                    }
+                  }));
                 },
                 child: Row(
                   children: [

@@ -46,6 +46,7 @@ class AuthMethods {
           'bio': bio,
           'followers': [],
           'following': [],
+          'messengers': []
         });
         res = "success";
       }
