@@ -27,6 +27,7 @@ class _SingleChatScreenState extends State<SingleChatScreen> {
         .collection('users')
         .doc(widget.senderId)
         .collection('messages')
+        .where("userId", isEqualTo: widget.receiverId)
         .orderBy('timestamp', descending: false)
         .snapshots();
   }
@@ -40,6 +41,7 @@ class _SingleChatScreenState extends State<SingleChatScreen> {
           .collection('messages')
           .add({
         'position': "right",
+        'userId': widget.receiverId,
         'message': message,
         'timestamp': FieldValue.serverTimestamp(),
       });
@@ -51,6 +53,7 @@ class _SingleChatScreenState extends State<SingleChatScreen> {
           .collection("messages")
           .add({
         'position': "left",
+        'userId': widget.senderId,
         'message': message,
         'timestamp': FieldValue.serverTimestamp(),
       });

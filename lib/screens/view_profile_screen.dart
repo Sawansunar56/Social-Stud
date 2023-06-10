@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:social_media/screens/chat_screen.dart';
 import 'package:social_media/screens/post_page.dart';
 
 import '../constants/colors.dart';
@@ -27,6 +28,7 @@ class _ViewProfileState extends State<ViewProfile> {
     isFollowingChecker();
   }
 
+  // setter for rerender on change
   isFollowingChecker() async {
     bool data = await checkFollowingExists();
     setState(() {
@@ -34,6 +36,7 @@ class _ViewProfileState extends State<ViewProfile> {
     });
   }
 
+  // checks in firebase whether the provided id is inside the array list in the curuesr
   checkFollowingExists() async {
     try {
       DocumentSnapshot snapshot = await FirebaseFirestore.instance
@@ -292,6 +295,17 @@ class _ViewProfileState extends State<ViewProfile> {
                                               ),
                                               onPressed: () {
                                                 makeChatRoom();
+                                                Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                        builder:
+                                                            (context) => SingleChatScreen(
+                                                                senderId:
+                                                                    curUserId,
+                                                                receiverId:
+                                                                    widget
+                                                                        .userId,
+                                                                user:
+                                                                    userData!)));
                                               },
                                               child: Text(
                                                 "Message",

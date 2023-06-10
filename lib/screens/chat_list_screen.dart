@@ -31,6 +31,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         if (snapshot.exists) {
           Map<String, dynamic> messengerData =
               snapshot.data() as Map<String, dynamic>;
+
           messengers.add(messengerData);
         }
       }

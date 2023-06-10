@@ -38,6 +38,7 @@ class AuthMethods {
 
         _firestore.collection('users').doc(cred.user!.uid).set({
           'profileImage': image,
+          'backgroundImage': "",
           'username': username,
           'powername': username,
           'uid': cred.user!.uid,

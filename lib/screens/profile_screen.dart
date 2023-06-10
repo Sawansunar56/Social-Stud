@@ -69,8 +69,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           color: Colors.white,
                           image: DecorationImage(
                             fit: BoxFit.cover,
-                            image: NetworkImage(
-                                'https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60'),
+                            image: userData!["backgroundImage"] == ""
+                                ? NetworkImage(
+                                    'https://images.unsplash.com/photo-1566275529824-cca6d008f3da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cGhvdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=600&q=60')
+                                : NetworkImage(userData!['backgroundImage']),
                           ),
                         ),
                         child: Text(""),
@@ -222,7 +224,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             Navigator.of(context).push(
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        EditProfile()));
+                                                        EditProfile(
+                                                            userData:
+                                                                userData!)));
                                           },
                                           child: Text(
                                             "Manage",
